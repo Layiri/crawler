@@ -20,6 +20,8 @@ class Crawler implements ICrawler
      */
     private $site_address;
 
+    const DEFAULT_DEPTH = 5;
+
     public function __construct(SiteAddress $site_address)
     {
         $this->site_address = $site_address;
@@ -31,16 +33,16 @@ class Crawler implements ICrawler
      * @param int $depth Depth of access to page links
      * @return array
      */
-    public function getAllPagesFromSite($url, $depth = 5)
+    public function getAllPagesFromSite($url, $depth = self::DEFAULT_DEPTH)
     {
         static $seen = array();
-        static $arr = array();
+        static $array_all_urls = array();
         if (isset($seen[$url]) || $depth === 0) {
             return;
         }
 
         $seen[$url] = true;
-        $arr [] = $url;
+        $array_all_urls [] = $url;
         $dom = new DOMDocument('1.0');
         @$dom->loadHTMLFile($url);
 
@@ -48,9 +50,7 @@ class Crawler implements ICrawler
         foreach ($anchors as $element) {
             $href = $element->getAttribute('href');
             $host = "http://" . parse_url($url, PHP_URL_HOST);
-
             if (0 !== strpos($href, 'http')) {
-                /* this is where I changed hobodave's code */
                 $href = $host . '/' . ltrim($href, '/');
             } else {
                 $hostHref = "http://" . parse_url($href, PHP_URL_HOST);
@@ -58,11 +58,11 @@ class Crawler implements ICrawler
                     continue;
                 }
             }
-            $arr[] = $href;
+            $array_all_urls[] = $href;
             $this->getAllPagesFromSite($href, $depth - 1);
         }
 
-        return $arr;
+        return $array_all_urls;
     }
 
     /**
@@ -88,7 +88,7 @@ class Crawler implements ICrawler
      */
     public function run()
     {
-        $all_pages = array_unique($this->getAllPagesFromSite(trim($this->site_address),5));
+        $all_pages = array_unique($this->getAllPagesFromSite(trim($this->site_address), 5));
 
         $array_pages_tag = [];
         $i = 0;
