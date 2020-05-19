@@ -30,7 +30,7 @@ class SaveFileHelpers
     public static function createFile($fileToSave, $extension = 'txt')
     {
         $filename = self::filename();
-        $myfile = fopen('resources' . '/' . $filename . $extension, "w") or die("Unable to open file!");
+        $myfile = fopen('resources' . '/' . $filename . '.' . $extension, "w") or die("Unable to open file!");
         fwrite($myfile, $fileToSave);
         fclose($myfile);
     }

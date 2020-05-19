@@ -1,0 +1,8 @@
+version: "3.8"
+services:
+  webapp:
+    build: .
+    volumes:
+      - .:/var/www/html
+    ports:
+    - 80:80

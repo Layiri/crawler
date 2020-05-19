@@ -4,7 +4,7 @@
 namespace src\crawler;
 
 
-use http\Exception\InvalidArgumentException;
+use Exception;
 
 /**
  * Class SiteAddress
@@ -40,14 +40,25 @@ class SiteAddress
     {
         $site_address = filter_var($site_address, FILTER_SANITIZE_URL);
 
-        if (!filter_var($site_address, FILTER_VALIDATE_URL)) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    '"%s" is not a valid site address',
-                    $site_address
-                )
-            );
+        try {
+            if (!filter_var($site_address, FILTER_VALIDATE_URL)) {
+                throw new Exception(
+                    sprintf(
+                        '"%s" is not a valid site address ',
+                        $site_address
+                    )
+                );
+            }
+
+        } catch (Exception $e) {
+            echo $e->getMessage();
         }
     }
 
-}
+    public static function sanitizeURL($url)
+    {
+        return (strtolower(substr($url, 0, 7)) == 'http://' || strtolower(substr($url, 0, 8)) == 'https://') ? $url : 'http://' . $url;
+    }
+
+
+}//$url = strpos($url, 'http') !== 0 ? "http://$url" : $url;
